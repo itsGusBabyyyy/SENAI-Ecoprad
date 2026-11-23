@@ -1,0 +1,4 @@
+Fontes embutidas (subconjunto latino, woff2), todas com licença SIL Open Font License 1.1 (uso livre em sites):
+- oswald.woff2   Oswald (Vernon Adams)           -> marca ECOPRAD
+- fraunces*.woff2 Fraunces (Undercase Type)       -> títulos
+- inter.woff2    Inter (Rasmus Andersson)        -> texto corrido

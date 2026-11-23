@@ -328,7 +328,7 @@ const TER = (() => {
     const hm = new T.MeshStandardMaterial({ color: "#66704f", roughness: 1 }), r = rng(21);
     for (let i = 0; i < 9; i++) {
       const a = -2.4 + i * 0.6 + r() * 0.3, R = 300 + r() * 120, m = new T.Mesh(new T.SphereGeometry(1, 24, 12), hm);
-      m.scale.set(90 + r() * 80, 18 + r() * 26, 60 + r() * 40); m.position.set(Math.sin(a) * R, base(0, -Math.cos(a) * R) - 6, -Math.cos(a) * R); root.add(m);
+      m.scale.set(90 + r() * 80, 18 + r() * 26, 60 + r() * 40); m.userData.horizonte = true; m.position.set(Math.sin(a) * R, base(0, -Math.cos(a) * R) - 6, -Math.cos(a) * R); root.add(m);
     }
     vegetation(root); fence(root); WD.rain = rain(root, Q.rain); WD.splash = splashes(root, 700); WD.sed = sediment(root, 420); WD.coll = collapse(root); buildWorks(root);
     WD.F_inst = sample(WD.instP);
@@ -818,5 +818,5 @@ const TER = (() => {
     }
     return base(x, z) - cut;
   }
-  return { update, base, surface, at, centerAt, pathPt, palFloor, SYS, get RES() { return RES; }, get MAIN() { return MAIN; }, ensure() { if (!WD) build(); } };
+  return { get WD() { return WD; }, update, base, surface, at, centerAt, pathPt, palFloor, SYS, get RES() { return RES; }, get MAIN() { return MAIN; }, ensure() { if (!WD) build(); } };
 })();

@@ -2,121 +2,181 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Controle de erosão e águas pluviais · modelo 3D</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M2 24 C10 14 22 14 30 24 Z%22 fill=%22%23b2603a%22/%3E%3Cpath d=%22M16 4 C12 10 12 13 16 14 C20 13 20 10 16 4Z%22 fill=%22%233f9fd6%22/%3E%3C/svg%3E">
-<meta name="description" content="Modelo 3D interativo: da chuva à voçoroca e à solução com terraços, espinha de peixe, paliçadas e reservatórios.">
-<style>
-  :root { --amar: #f2b632; --fundo: rgba(14, 17, 20, .74); --borda: rgba(255, 255, 255, .14); --txt: #f3f1ec; --sub: #b9bdc2; }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #8f99a3; font-family: "Segoe UI", Roboto, Arial, sans-serif; color: var(--txt); touch-action: none; }
-  #cena { position: fixed; inset: 0; display: block; width: 100%; height: 100%; }
-  button { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--borda); background: var(--fundo); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 10px; }
-  button:hover { border-color: rgba(255, 255, 255, .4); }
-  button:focus-visible { outline: 2px solid var(--amar); outline-offset: 2px; }
-
-  #titulo { position: fixed; left: 16px; top: 14px; padding: 10px 16px 11px; background: var(--fundo); border-left: 4px solid var(--amar); border-radius: 0 10px 10px 0; max-width: min(460px, 70vw); backdrop-filter: blur(6px); }
-  #titulo h1 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: .01em; }
-  #titulo p { margin: 3px 0 0; font-size: 12.5px; color: var(--sub); }
-
-  #barra { position: fixed; right: 14px; top: 14px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; max-width: 60vw; }
-  #barra button { height: 40px; min-width: 40px; padding: 0 12px; font-size: 13.5px; display: inline-flex; align-items: center; gap: 6px; }
-  #barra button.on { border-color: var(--amar); color: #fff; box-shadow: inset 0 0 0 1px var(--amar); }
-  .seg { display: inline-flex; border-radius: 10px; overflow: hidden; border: 1px solid var(--borda); }
-  .seg button { border: 0; border-radius: 0; }
-  .seg button.on { background: var(--amar); color: #1a1a1a; box-shadow: none; font-weight: 700; }
-  svg.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-  #painel { position: fixed; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(760px, calc(100vw - 24px)); background: var(--fundo); border: 1px solid var(--borda); border-radius: 14px; padding: 12px 14px 12px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: opacity .25s, transform .25s; }
-  #painel.oculto { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
-  #topo { display: flex; align-items: center; gap: 12px; }
-  #nav { display: flex; gap: 8px; }
-  #nav button { width: 52px; height: 52px; font-size: 22px; display: grid; place-items: center; border-radius: 12px; }
-  #nav button#prox { background: var(--amar); color: #1a1a1a; border-color: var(--amar); }
-  #nav button:disabled { opacity: .35; cursor: default; }
-  #info { flex: 1; min-width: 0; }
-  #num { font-size: 12px; color: var(--amar); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-  #nome { font-size: 19px; font-weight: 700; margin-top: 1px; }
-  #desc { font-size: 14px; line-height: 1.45; color: #dfe1e3; margin: 8px 0 0; }
-  #desc.fechado { display: none; }
-  #pontos { display: flex; gap: 5px; margin-top: 10px; }
-  #pontos button { flex: 1; height: 8px; padding: 0; border-radius: 4px; border: 0; background: rgba(255, 255, 255, .22); backdrop-filter: none; }
-  #pontos button.feito { background: rgba(242, 182, 50, .55); }
-  #pontos button.atual { background: var(--amar); }
-  #pontos button .bar { display: block; height: 100%; border-radius: 4px; background: var(--amar); }
-  #btnTexto { height: 34px; padding: 0 10px; font-size: 12.5px; white-space: nowrap; }
-
-  #rotulos { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
-  .rot { position: absolute; left: 0; top: 0; will-change: transform; transition: opacity .35s; }
-  .rot .pt { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--amar); box-shadow: 0 0 0 3px rgba(242, 182, 50, .35); }
-  .rot .ln { position: absolute; height: 2px; background: var(--amar); transform-origin: 0 50%; }
-  .rot .tx { position: absolute; white-space: nowrap; font-size: 13px; font-weight: 700; letter-spacing: .06em; background: rgba(12, 14, 16, .72); padding: 4px 10px 5px; border-left: 4px solid var(--amar); border-radius: 0 6px 6px 0; }
-
-  #dica { position: fixed; left: 50%; top: 74px; transform: translateX(-50%); font-size: 13px; background: var(--fundo); padding: 7px 14px; border-radius: 20px; border: 1px solid var(--borda); transition: opacity .6s; pointer-events: none; text-align: center; max-width: calc(100vw - 24px); }
-  #veu { position: fixed; inset: 0; background: #11161b; opacity: 0; pointer-events: none; transition: opacity .22s; }
-  #carregando { position: fixed; inset: 0; display: grid; place-items: center; background: #1b2026; z-index: 10; transition: opacity .5s; }
-  #carregando .cx { text-align: center; }
-  #carregando .sp { width: 46px; height: 46px; border-radius: 50%; border: 4px solid rgba(255, 255, 255, .15); border-top-color: var(--amar); margin: 0 auto 14px; animation: gira 1s linear infinite; }
-  @keyframes gira { to { transform: rotate(360deg); } }
-  #erro { display: none; max-width: 420px; margin: 10px auto 0; color: #ffb4a8; font-size: 13px; }
-
-  @media (max-width: 640px) {
-    #titulo { padding: 7px 10px 8px; max-width: 46vw; }
-    #titulo h1 { font-size: 13.5px; }
-    #titulo p { display: none; }
-    #barra { max-width: 52vw; gap: 6px; }
-    #barra button { height: 36px; min-width: 36px; padding: 0 9px; font-size: 12.5px; }
-    #barra .lbl { display: none; }
-    #nome { font-size: 16px; }
-    #desc { font-size: 13px; }
-    #nav button { width: 46px; height: 46px; }
-    .rot .tx { font-size: 11px; padding: 3px 7px 4px; }
-    #dica { top: auto; bottom: 170px; }
-  }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ecoprad · Mitigação de erosão e lixiviação</title>
+<meta name="description" content="Ecoprad: controle de erosão com espinha de peixe, geotêxtil, paliçadas de eucalipto e reservatórios, explicado em um modelo 3D.">
+<link rel="icon" href="assets/emblema.webp">
+<link rel="preload" href="assets/morros.webp" as="image">
+<link rel="preload" href="fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-<canvas id="cena"></canvas>
-<div id="rotulos"></div>
 
-<div id="titulo">
-  <h1 id="tituloTxt">Controle de erosão e águas pluviais</h1>
-  <p id="subTxt">Montes Claros – MG · modelo 3D da solução proposta</p>
-</div>
-
-<div id="barra">
-  <div class="seg" role="group" aria-label="Comparar antes e depois">
-    <button id="bAntes" title="Antes do projeto (tecla A)">Antes</button>
-    <button id="bDepois" title="Depois do projeto (tecla D)">Depois</button>
+<header id="nav">
+  <div class="pilula">
+    <a class="marca" href="#home" aria-label="Ecoprad, início"><img class="logo" src="assets/emblema.webp" alt="" width="36" height="36"><span>ECOPRAD</span></a>
+    <nav>
+      <a href="#home" data-sec="home">Home</a>
+      <a href="#etapas" data-sec="etapas">Etapas</a>
+    </nav>
+    <a href="demo/index.html" class="btn pequeno destaque">Demonstração 3D</a>
   </div>
-  <button id="bRot" class="on" title="Etiquetas (tecla L)"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/></svg><span class="lbl">Etiquetas</span></button>
-  <button id="bCam" class="on" title="Câmera automática a cada etapa (tecla C)"><svg class="ic" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg><span class="lbl">Câmera auto</span></button>
-  <button id="bCentro" title="Voltar à vista da etapa (tecla R)"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
-  <button id="bPainel" title="Esconder ou mostrar o painel (tecla H)"><svg class="ic" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-  <button id="bTela" title="Tela cheia (tecla F)"><svg class="ic" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
-</div>
+</header>
 
-<div id="painel">
-  <div id="topo">
-    <div id="nav">
-      <button id="ant" title="Etapa anterior (←)" aria-label="Etapa anterior">&#8249;</button>
-      <button id="prox" title="Próxima etapa (→ ou espaço)" aria-label="Próxima etapa">&#8250;</button>
-    </div>
-    <div id="info">
-      <div id="num">Etapa 1 de 11</div>
-      <div id="nome">Terreno natural</div>
-    </div>
-    <button id="btnTexto" title="Mostrar ou esconder a explicação (tecla T)">Texto</button>
+<section id="home" class="hero">
+  <div class="folhas" aria-hidden="true">
+    <img class="folha" src="assets/folha1.webp" alt="" style="--x:9%;--y:38%;--w:84px;--r:-28deg;--d:7s;--v:.5">
+    <img class="folha" src="assets/folha3.webp" alt="" style="--x:27%;--y:21%;--w:96px;--r:12deg;--d:9s;--v:.9">
+    <img class="folha" src="assets/folha2.webp" alt="" style="--x:44%;--y:27%;--w:70px;--r:-8deg;--d:8s;--v:.7">
+    <img class="folha" src="assets/folha4.webp" alt="" style="--x:71%;--y:9%;--w:88px;--r:24deg;--d:10s;--v:1.1">
+    <img class="folha" src="assets/folha1.webp" alt="" style="--x:86%;--y:34%;--w:80px;--r:40deg;--d:7.5s;--v:.6">
+    <img class="folha" src="assets/folha3.webp" alt="" style="--x:31%;--y:58%;--w:78px;--r:-36deg;--d:8.5s;--v:1.3">
+    <img class="folha" src="assets/folha4.webp" alt="" style="--x:57%;--y:60%;--w:74px;--r:-14deg;--d:9.5s;--v:1.5">
+    <img class="folha" src="assets/folha2.webp" alt="" style="--x:75%;--y:56%;--w:66px;--r:30deg;--d:6.5s;--v:1.2">
   </div>
-  <p id="desc"></p>
-  <div id="pontos"></div>
-</div>
+  <div class="hero-txt">
+    <p class="kicker">Mitigação de erosão e lixiviação</p>
+    <h1 class="marca-grande">ECOPRAD</h1>
+  </div>
+  <img class="morros" src="assets/morros.webp" alt="" aria-hidden="true">
+  <div class="hero-base">
+    <p class="lead">Como a água da chuva abre uma voçoroca e como a técnica da <em>espinha de peixe</em> devolve o controle ao terreno.</p>
+    <div class="acoes">
+      <a class="btn claro" href="#etapas">Ver as etapas</a>
+      <a class="btn vidro" href="demo/index.html">Abrir demonstração 3D</a>
+    </div>
+  </div>
+  <ul class="equipe cartao">
+    <li>Davi Alves</li><li>Enzo Emanoel</li><li>Jeane Pereira</li><li>Sâmela Rosean</li><li>Tatiana Andrade</li>
+  </ul>
+  <a class="rolar" href="#etapas" aria-label="Rolar para as etapas">role ↓</a>
+</section>
 
-<div id="dica">Arraste para girar · role ou faça pinça para aproximar · botão direito ou dois dedos para mover</div>
-<div id="veu"></div>
-<div id="carregando"><div class="cx"><div class="sp"></div><div>Montando o terreno 3D…</div><div id="erro"></div></div></div>
+<main id="etapas" class="historia">
+  <div class="folhas soltas" aria-hidden="true">
+    <img class="folha" src="assets/folha2.webp" alt="" style="--x:1.5%;--y:16%;--w:58px;--r:20deg;--d:9s;--v:.25">
+    <img class="folha" src="assets/folha4.webp" alt="" style="--x:2.5%;--y:47%;--w:50px;--r:-30deg;--d:11s;--v:.35">
+    <img class="folha" src="assets/folha1.webp" alt="" style="--x:1%;--y:80%;--w:62px;--r:8deg;--d:8s;--v:.3">
+  </div>
+  <div class="textos">
+    <!-- data-u: momento da história 3D (0 a 10) · data-v: vista da câmera -->
+    <article class="bloco" data-u="0" data-v="0">
+      <p class="tag"><span>01</span>O problema</p>
+      <h2>O que é a <em>erosão</em></h2>
+      <p>Erosão é o desgaste do solo pela água e pelo vento. Num terreno exposto, cada chuva arranca e carrega um pouco da terra, até que pequenos caminhos de água se transformam em valas profundas.</p>
+    </article>
+    <article class="bloco" data-u="1" data-v="1">
+      <p class="tag"><span>02</span>Demanda</p>
+      <h2>Por que o terreno <em>se desgasta</em></h2>
+      <ul>
+        <li>Erosão causada pelo impacto das gotas de chuva e pelo vento.</li>
+        <li>Retirada da cobertura vegetal.</li>
+        <li>Movimentação de terra.</li>
+        <li>Ausência de medidas de conservação do solo.</li>
+      </ul>
+    </article>
+    <article class="bloco" data-u="3" data-v="3">
+      <p class="tag"><span>03</span>Consequências</p>
+      <h2>Dos sulcos à <em>voçoroca</em></h2>
+      <ul>
+        <li>Perda da camada fértil do solo e formação de sulcos e ravinas.</li>
+        <li>Assoreamento de cursos d'água e transporte de sedimentos.</li>
+        <li>Comprometimento da estabilidade do terreno.</li>
+        <li>Prejuízos ambientais e econômicos.</li>
+      </ul>
+    </article>
+    <article class="bloco" data-u="5" data-v="5">
+      <p class="tag"><span>04</span>Solução · Drenagem</p>
+      <h2>A espinha <em>de peixe</em></h2>
+      <p>Direcionamento e controle do escoamento da água pela espinha: curvas de nível seguram a água no alto, e um canal central com ramais laterais a conduz de forma organizada.</p>
+    </article>
+    <article class="bloco" data-u="6" data-v="6">
+      <p class="tag"><span>05</span>Solução · Proteção do solo</p>
+      <h2>Geotêxtil, matéria orgânica <em>e vegetação</em></h2>
+      <p>Os canais são revestidos com manta geotêxtil. O solo por onde a água passa fica protegido e a água escoa sem abrir novos sulcos.</p>
+    </article>
+    <article class="bloco" data-u="7" data-v="7">
+      <p class="tag"><span>06</span>Solução · Contenção</p>
+      <h2>Paliçadas <em>de eucalipto</em></h2>
+      <p>Paliçadas de eucalipto, pedras e matéria orgânica reduzem a força da água no fim de cada ramal e retêm a terra que ela carrega.</p>
+    </article>
+    <article class="bloco" data-u="9" data-v="9">
+      <p class="tag"><span>07</span>Na prática</p>
+      <h2>Como o sistema funciona <em>na prática?</em></h2>
+      <p>Na chuva, a água é desacelerada, direcionada, retida e levada por um caminho de pedras até o reservatório. Quando ele enche, a boia abre a saída para outro reservatório e para a irrigação.</p>
+    </article>
+    <article class="bloco" data-u="10" data-v="10">
+      <p class="tag"><span>08</span>Viabilidade</p>
+      <h2>Simples de implantar <em>e manter</em></h2>
+      <ul>
+        <li><b>Materiais sustentáveis:</b> eucalipto, geotêxtil, pedras e matéria orgânica.</li>
+        <li><b>Implantação gradual:</b> prioridade para as áreas críticas de erosão.</li>
+        <li><b>Viabilidade econômica:</b> redução de custos e manutenção simplificada.</li>
+      </ul>
+    </article>
+    <article class="bloco" data-u="10" data-v="11">
+      <p class="tag"><span>09</span>Resultados esperados</p>
+      <h2>Solo protegido, <em>água aproveitada</em></h2>
+      <ul>
+        <li>Redução da erosão e da perda de solo.</li>
+        <li>Prevenção do assoreamento e retenção de sedimentos.</li>
+        <li>Recuperação e proteção ambiental da área.</li>
+      </ul>
+      <blockquote>“Com a implantação do projeto Ecoprad, esperamos reduzir os impactos da erosão, proteger o solo e contribuir para a recuperação ambiental da área.”</blockquote>
+    </article>
+    <article class="bloco" data-u="10" data-v="12">
+      <p class="tag"><span>10</span>Conclusão</p>
+      <h2>Controle da erosão <em>e da lixiviação</em></h2>
+      <p>A equipe Ecoprad busca controlar a erosão e a lixiviação do solo com a técnica espinha de peixe e o uso de geotêxtil, promovendo a retenção da água, a recuperação da vegetação e a sustentabilidade ambiental.</p>
+    </article>
+  </div>
+
+  <!-- o diorama 3D: sem moldura nem fundo, faz parte da página -->
+  <div class="palco" aria-label="Diorama 3D do terreno">
+    <canvas id="cena"></canvas>
+    <div id="rotulos"></div>
+    <div id="estado3d" class="so-leitor">carregando o 3D…</div>
+    <ol id="trilha" aria-label="Etapas"></ol>
+  </div>
+</main>
+
+<section id="convite" class="convite">
+  <div class="convite-cartao">
+    <div class="ceu" aria-hidden="true"></div><img class="morros" src="assets/morros.webp" alt="" aria-hidden="true" loading="lazy">
+    <img class="folha solta-c" src="assets/folha3.webp" alt="" aria-hidden="true">
+    <div class="convite-txt">
+      <h2>Explore o <em>modelo completo</em></h2>
+      <p>Gire o terreno, compare antes e depois e avance pelas 11 etapas no seu ritmo.</p>
+      <a class="btn claro" href="demo/index.html">Abrir demonstração 3D</a>
+    </div>
+  </div>
+</section>
+
+<footer id="fim">
+  <div class="fim-topo">
+    <div class="fim-marca">
+      <img class="logo grande" src="assets/emblema.webp" alt="Emblema da Ecoprad" width="84" height="84">
+      <h2>Obrigado</h2>
+      <p class="nota">Projeto acadêmico · desafio SENAI · dados fictícios</p>
+    </div>
+    <div class="fim-col">
+      <h3>Navegação</h3>
+      <a href="#home">Home</a><a href="#etapas">Etapas</a><a href="demo/index.html">Demonstração 3D</a>
+    </div>
+    <div class="fim-col">
+      <h3>Equipe</h3>
+      <ul class="equipe"><li>Davi Alves</li><li>Enzo Emanoel</li><li>Jeane Pereira</li><li>Sâmela Rosean</li><li>Tatiana Andrade</li></ul>
+    </div>
+  </div>
+  <div class="fim-palavra">
+    <div class="ceu" aria-hidden="true"></div>
+    <p class="marca-grande" aria-hidden="true">ECOPRAD</p>
+    <img class="morros" src="assets/morros.webp" alt="" aria-hidden="true" loading="lazy">
+  </div>
+</footer>
 
 <script src="terreno.js"></script>
-<script src="app.js"></script>
+<script src="site.js"></script>
 </body>
 </html>

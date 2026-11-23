@@ -1,0 +1,173 @@
+/* Site da Ecoprad · visual final
+   Fontes (licença OFL, em fonts/): Oswald = marca ECOPRAD · Fraunces = títulos · Inter = texto corrido */
+@font-face { font-family: "Oswald"; src: url(../fonts/oswald.woff2) format("woff2"); font-weight: 200 700; font-display: swap; }
+@font-face { font-family: "Fraunces"; src: url(../fonts/fraunces.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Fraunces"; src: url(../fonts/fraunces-italic.woff2) format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Inter"; src: url(../fonts/inter.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+
+:root {
+  --nav: 84px; --fundo: #fbfaf6; --creme: #f3eee3; --tinta: #1b2a1f; --sub: #5c6a5f; --linha: #e3e5df; --verde: #234028; --verde2: #3f6b3a; --folha: #6f8f5a;
+  --serif: "Fraunces", Georgia, "Times New Roman", serif; --sans: "Inter", system-ui, "Segoe UI", Arial, sans-serif; --marca: "Oswald", "Arial Narrow", Impact, sans-serif;
+  --ceu: linear-gradient(180deg, #a9cfe8 0%, #cfe4ef 38%, #eef3ee 72%, #f6f5ee 100%);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: var(--sans); color: var(--tinta); background: var(--fundo); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+img { display: block; }
+h1, h2, h3 { margin: 0 0 .45em; }
+h2 { font-family: var(--serif); font-weight: 400; line-height: 1.06; letter-spacing: -.02em; font-variation-settings: "opsz" 144, "SOFT" 30; }
+h2 em, .lead em { font-style: italic; color: var(--verde2); font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; }
+a { color: inherit; }
+::selection { background: #cfe0c4; }
+.so-leitor { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; border-radius: 14px; background: var(--verde); color: #fff; text-decoration: none; font: 600 15px var(--sans);
+  transition: transform .25s cubic-bezier(.2,.8,.2,1), background .25s, box-shadow .25s; box-shadow: 0 6px 18px -8px rgba(35,64,40,.6); }
+.btn:hover { transform: translateY(-2px); background: #1a3120; }
+.btn.claro { background: #fff; color: var(--verde); box-shadow: 0 8px 24px -10px rgba(0,0,0,.35); }
+.btn.claro:hover { background: #f4f7f1; }
+.btn.vidro { background: rgba(22,44,28,.28); color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.btn.vidro:hover { background: rgba(255,255,255,.28); }
+.btn.pequeno { padding: 10px 16px; border-radius: 11px; font-size: 14px; box-shadow: none; }
+
+/* ---------------- menu: pílula flutuante */
+#nav { position: fixed; inset: 0 0 auto 0; height: var(--nav); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 0 16px; pointer-events: none; }
+.pilula { pointer-events: auto; display: flex; align-items: center; gap: 22px; padding: 7px 7px 7px 9px; border-radius: 18px;
+  background: rgba(251,250,246,.78); border: 1px solid rgba(35,64,40,.08); box-shadow: 0 10px 30px -18px rgba(27,42,31,.45); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); }
+.marca { display: flex; align-items: center; gap: 9px; text-decoration: none; font: 600 17px var(--marca); letter-spacing: .1em; color: var(--verde); }
+.logo { width: 36px; height: 36px; object-fit: contain; }
+.logo.grande { width: 84px; height: 84px; margin: 0 0 18px; }
+.pilula nav { display: flex; gap: 2px; }
+.pilula nav a { text-decoration: none; padding: 8px 14px; border-radius: 10px; font-size: 15px; color: var(--sub); transition: color .2s, background .2s; }
+.pilula nav a:hover { color: var(--tinta); }
+.pilula nav a.ativo { color: var(--verde); background: #fff; font-weight: 600; }
+
+/* ---------------- hero: como a capa · ECOPRAD centralizado, morros na frente da base das letras, folhas flutuando */
+.hero { position: relative; min-height: 100svh; padding: calc(var(--nav) + 4vh) 5vw 0; display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden;
+  background: radial-gradient(120% 70% at 50% 0%, #fffdf8 0%, var(--creme) 70%); }
+.hero-txt { position: relative; z-index: 1; margin-top: 6vh; }
+.kicker { font: 500 clamp(12px, 1.1vw, 15px) var(--sans); letter-spacing: .42em; text-transform: uppercase; color: var(--verde); margin: 0 0 1.4vh; padding-left: .42em; }
+.marca-grande { font-family: var(--marca); font-weight: 700; text-transform: uppercase; line-height: .86; letter-spacing: -.005em; margin: 0; color: var(--verde); }
+.hero .marca-grande { font-size: clamp(88px, 21vw, 360px); animation: sobe 1.2s cubic-bezier(.2,.8,.2,1) both; }
+.hero .morros { position: absolute; z-index: 2; left: 50%; bottom: 0; transform: translateX(-50%); width: max(112vw, 1500px); height: 50vh; object-fit: cover; object-position: 50% 0;
+  animation: sobeM 1.4s .1s cubic-bezier(.2,.8,.2,1) both; }
+.hero::after { content: ""; position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 30vh; pointer-events: none;
+  background: linear-gradient(180deg, rgba(20,38,24,0) 0%, rgba(20,38,24,.22) 45%, rgba(20,38,24,.1) 70%, var(--fundo) 100%); }
+.hero-base { position: relative; z-index: 3; margin-top: auto; padding: 0 0 15vh; display: flex; flex-direction: column; align-items: center; animation: aparece 1s .5s both; }
+.lead { font-size: clamp(16px, 1.35vw, 19px); max-width: 560px; color: #fff; margin: 0 0 22px; text-shadow: 0 1px 14px rgba(10,30,15,.6), 0 1px 2px rgba(10,30,15,.45); font-weight: 500; }
+.lead em { font-family: var(--serif); font-size: 1.14em; color: #fff; }
+.acoes { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.equipe { list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--sub); }
+.equipe.cartao { position: absolute; z-index: 3; left: 3vw; bottom: 4vh; text-align: left; padding: 12px 18px; border-radius: 16px; color: var(--verde); font-weight: 600; line-height: 1.5;
+  background: rgba(226,236,214,.7); border: 1px solid rgba(255,255,255,.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); animation: aparece 1s .8s both; }
+.rolar { position: absolute; z-index: 3; right: 3vw; bottom: 5vh; font-size: 13px; color: var(--verde); text-decoration: none; letter-spacing: .14em; font-weight: 600; }
+.rolar::after { content: ""; display: block; width: 1px; height: 34px; margin: 8px auto 0; background: var(--verde); transform-origin: top; animation: risca 2.2s ease-in-out infinite; }
+
+/* folhas: flutuam sozinhas (animação) e com a rolagem (site.js ajusta --sy) */
+.folhas { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.folha { position: absolute; left: var(--x); top: var(--y); width: var(--w); height: auto; translate: 0 calc(var(--sy, 0px) * var(--v, 1) * -1);
+  rotate: var(--r); animation: flutua var(--d, 8s) ease-in-out infinite alternate; filter: drop-shadow(0 10px 12px rgba(30,50,30,.18)); will-change: transform; }
+.folha:nth-child(2n) { animation-delay: -3s; } .folha:nth-child(3n) { animation-direction: alternate-reverse; }
+@keyframes flutua { 0% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(8px, -14px) rotate(7deg); } 100% { transform: translate(-6px, 6px) rotate(-6deg); } }
+@keyframes sobe { from { opacity: 0; translate: 0 40px; } to { opacity: 1; translate: 0 0; } }
+@keyframes sobeM { from { opacity: 0; transform: translate(-50%, 50px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes aparece { from { opacity: 0; } to { opacity: 1; } }
+@keyframes risca { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(0); } }
+
+/* ---------------- história: texto à esquerda, diorama 3D solto na página à direita */
+.historia { position: relative; display: grid; grid-template-columns: minmax(340px, 42%) 1fr; }
+.folhas.soltas { z-index: 0; }
+.folhas.soltas .folha { opacity: .9; }
+.textos { padding: 0 2vw 0 7vw; position: relative; z-index: 2; }
+.bloco { min-height: calc(100vh - var(--nav)); display: flex; flex-direction: column; justify-content: center; max-width: 500px; padding: 40px 0; opacity: .22; transform: translateY(12px);
+  transition: opacity .6s, transform .8s cubic-bezier(.2,.8,.2,1); }
+.bloco.ativo { opacity: 1; transform: none; }
+.bloco h2 { font-size: clamp(34px, 3.6vw, 56px); color: var(--tinta); }
+.bloco p, .bloco li { font-size: 17px; color: #3a463d; }
+.bloco ul { padding-left: 0; margin: 0; list-style: none; }
+.bloco li { margin: .55em 0; padding-left: 26px; position: relative; }
+.bloco li::before { content: ""; position: absolute; left: 0; top: .55em; width: 12px; height: 8px; border-radius: 0 8px; background: var(--folha); transform: rotate(-20deg); }
+.bloco b { color: var(--verde); }
+.tag { display: flex; align-items: baseline; gap: 12px; font: 600 12px var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--verde2); margin: 0 0 16px; }
+.tag span { font: italic 400 18px var(--serif); letter-spacing: 0; color: var(--verde); }
+.tag span::after { content: " / 10"; color: #a9b2ab; font-size: 13px; font-style: normal; }
+blockquote { margin: 26px 0 0; padding: 20px 22px 18px; border-radius: 18px; background: var(--creme); font: italic 400 20px/1.42 var(--serif); color: var(--verde); position: relative; }
+blockquote::before { content: "“"; position: absolute; left: 14px; top: -22px; font: 400 64px/1 var(--serif); color: var(--folha); }
+
+/* sem fundo, sem borda: o diorama flutua na página */
+.palco { position: sticky; top: 0; height: 100vh; z-index: 1; }
+#cena { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#trilha { position: absolute; right: 2.4vw; top: 50%; transform: translateY(-50%); list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; z-index: 3; }
+#trilha li { width: 7px; height: 7px; border-radius: 50%; background: #cdd5cc; cursor: pointer; transition: transform .3s, background .3s; }
+#trilha li:hover { background: var(--folha); }
+#trilha li.ativo { background: var(--verde); transform: scale(1.6); }
+
+#rotulos { position: absolute; inset: 0; pointer-events: none; }
+.rot { position: absolute; left: 0; top: 0; transition: opacity .4s; }
+.rot .pt { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2.5px var(--verde), 0 0 0 7px rgba(255,255,255,.35); }
+.rot .ln { position: absolute; height: 1.5px; background: var(--verde); transform-origin: 0 50%; }
+.rot .tx { position: absolute; white-space: nowrap; font: 600 11px var(--sans); letter-spacing: .1em; color: var(--verde); background: rgba(255,255,255,.94); padding: 6px 12px; border-radius: 999px; box-shadow: 0 6px 18px -6px rgba(27,42,31,.35); }
+
+/* ---------------- convite: cartão com céu e morros */
+.convite { padding: 12vh 4vw 10vh; }
+.convite-cartao { position: relative; min-height: 70vh; border-radius: 30px; overflow: hidden; display: flex; justify-content: center; text-align: center; isolation: isolate; }
+.ceu { position: absolute; inset: 0; z-index: -2; background: radial-gradient(40% 30% at 22% 26%, rgba(255,255,255,.75), transparent 70%), radial-gradient(35% 22% at 74% 18%, rgba(255,255,255,.6), transparent 70%), var(--ceu); }
+.convite-cartao .morros { position: absolute; z-index: -1; left: 50%; bottom: -2px; transform: translateX(-50%); width: max(100%, 1200px); height: 58%; object-fit: cover; object-position: 50% 0; }
+.convite-txt { position: relative; max-width: 640px; padding: 11vh 24px 0; }
+.convite h2 { font-size: clamp(38px, 4.6vw, 68px); color: var(--verde); }
+.convite p { color: #31503a; margin: 0 0 26px; font-size: 17px; }
+.solta-c { position: absolute; width: 90px; right: 12%; top: 14%; rotate: 28deg; animation: flutua 9s ease-in-out infinite alternate; filter: drop-shadow(0 10px 12px rgba(30,50,30,.2)); }
+
+/* ---------------- rodapé: colunas e a marca gigante entre o céu e os morros */
+#fim { padding: 9vh 5vw 0; background: var(--fundo); overflow: hidden; }
+.fim-topo { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; max-width: 1200px; margin: 0 auto; }
+#fim h2 { font-size: clamp(44px, 5vw, 72px); color: var(--verde); }
+.fim-col h3 { font: 600 13px var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--verde); margin-bottom: 14px; }
+.fim-col a, .fim-col li { display: block; text-decoration: none; color: var(--sub); font-size: 15px; margin: 0 0 8px; }
+.fim-col a:hover { color: var(--verde); }
+.nota { font-size: 13px; color: #8b948d; }
+.fim-palavra { position: relative; margin: 7vh -5vw 0; height: clamp(280px, 36vw, 640px); isolation: isolate; }
+.fim-palavra .ceu { -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 16%); mask-image: linear-gradient(180deg, transparent 0%, #000 16%); }
+.fim-palavra .marca-grande { position: absolute; z-index: 0; left: 50%; bottom: 24%; transform: translateX(-50%); font-size: clamp(110px, 21vw, 380px); color: #fff; white-space: nowrap; opacity: .97; }
+.fim-palavra .morros { position: absolute; z-index: 1; left: 50%; bottom: 0; transform: translateX(-50%); width: max(110%, 1300px); height: 46%; object-fit: cover; object-position: 50% 0; }
+
+/* ---------------- celular: diorama fixo em cima (com esmaecimento, sem linha), texto passando por baixo */
+@media (max-width: 860px) {
+  :root { --nav: 68px; }
+  .pilula { gap: 8px; padding: 5px 5px 5px 7px; }
+  .marca span:last-child { display: none; }
+  .pilula nav a { padding: 7px 9px; font-size: 13px; }
+  .btn.pequeno { padding: 8px 11px; font-size: 13px; }
+  .hero .marca-grande { font-size: 25vw; }
+  .hero-txt { margin-top: 12vh; }
+  .kicker { letter-spacing: .22em; padding-left: .22em; font-size: 11px; }
+  .hero .morros { width: 260vw; height: 52vh; }
+  .hero-base { padding-bottom: 17vh; }
+  .lead { font-size: 15px; padding: 0 4vw; }
+  .equipe.cartao { left: 50%; transform: translateX(-50%); bottom: 2.5vh; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 12px; width: 92vw; font-size: 12px; animation: none; }
+  .rolar { display: none; }
+  .hero .folha { width: calc(var(--w) * .55); }
+  .hero .folha:nth-child(n+6) { display: none; }
+  .fim-palavra { height: 240px; } .fim-palavra .marca-grande { font-size: 24vw; bottom: 30%; } .fim-palavra .morros { height: 42%; }
+  .folhas.soltas { display: none; }
+  .historia { display: flex; flex-direction: column; }
+  .palco { order: -1; top: 0; height: calc(44vh + var(--nav)); z-index: 5;
+    background: linear-gradient(var(--fundo) 0, var(--fundo) 82%, rgba(251,250,246,0) 100%); }
+  #cena, #rotulos { top: var(--nav); height: auto; bottom: 0; }
+  #trilha { right: 10px; gap: 7px; top: calc(50% + var(--nav) / 2); }
+  .textos { padding: 0 7vw; }
+  .bloco { min-height: 72vh; padding: 30px 0; }
+  .bloco h2 { font-size: 32px; }
+  .bloco p, .bloco li { font-size: 16px; }
+  .convite-cartao { min-height: 76vh; }
+  .convite-cartao .morros { width: 240%; height: 46%; }
+  .solta-c { width: 56px; top: 6%; }
+  .fim-topo { grid-template-columns: 1fr 1fr; }
+  .fim-marca { grid-column: 1 / -1; }
+  .fim-palavra .morros { width: 260%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .folha, .solta-c, .hero .marca-grande, .hero .morros, .hero-base, .equipe.cartao, .rolar::after { animation: none !important; }
+  .bloco, .btn { transition: none; }
+}

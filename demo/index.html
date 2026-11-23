@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Controle de erosão e águas pluviais · modelo 3D</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M2 24 C10 14 22 14 30 24 Z%22 fill=%22%23b2603a%22/%3E%3Cpath d=%22M16 4 C12 10 12 13 16 14 C20 13 20 10 16 4Z%22 fill=%22%233f9fd6%22/%3E%3C/svg%3E">
+<meta name="description" content="Modelo 3D interativo: da chuva à voçoroca e à solução com terraços, espinha de peixe, paliçadas e reservatórios.">
+<style>
+  :root { --amar: #f2b632; --fundo: rgba(14, 17, 20, .74); --borda: rgba(255, 255, 255, .14); --txt: #f3f1ec; --sub: #b9bdc2; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #8f99a3; font-family: "Segoe UI", Roboto, Arial, sans-serif; color: var(--txt); touch-action: none; }
+  #cena { position: fixed; inset: 0; display: block; width: 100%; height: 100%; }
+  button { font: inherit; color: inherit; cursor: pointer; border: 1px solid var(--borda); background: var(--fundo); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 10px; }
+  button:hover { border-color: rgba(255, 255, 255, .4); }
+  button:focus-visible { outline: 2px solid var(--amar); outline-offset: 2px; }
+
+  #titulo { position: fixed; left: 16px; top: 14px; padding: 10px 16px 11px; background: var(--fundo); border-left: 4px solid var(--amar); border-radius: 0 10px 10px 0; max-width: min(460px, 70vw); backdrop-filter: blur(6px); }
+  #titulo h1 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: .01em; }
+  #titulo p { margin: 3px 0 0; font-size: 12.5px; color: var(--sub); }
+
+  #barra { position: fixed; right: 14px; top: 14px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; max-width: 60vw; }
+  #barra button { height: 40px; min-width: 40px; padding: 0 12px; font-size: 13.5px; display: inline-flex; align-items: center; gap: 6px; }
+  #barra button.on { border-color: var(--amar); color: #fff; box-shadow: inset 0 0 0 1px var(--amar); }
+  .seg { display: inline-flex; border-radius: 10px; overflow: hidden; border: 1px solid var(--borda); }
+  .seg button { border: 0; border-radius: 0; }
+  .seg button.on { background: var(--amar); color: #1a1a1a; box-shadow: none; font-weight: 700; }
+  svg.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  #painel { position: fixed; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(760px, calc(100vw - 24px)); background: var(--fundo); border: 1px solid var(--borda); border-radius: 14px; padding: 12px 14px 12px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: opacity .25s, transform .25s; }
+  #painel.oculto { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
+  #topo { display: flex; align-items: center; gap: 12px; }
+  #nav { display: flex; gap: 8px; }
+  #nav button { width: 52px; height: 52px; font-size: 22px; display: grid; place-items: center; border-radius: 12px; }
+  #nav button#prox { background: var(--amar); color: #1a1a1a; border-color: var(--amar); }
+  #nav button:disabled { opacity: .35; cursor: default; }
+  #info { flex: 1; min-width: 0; }
+  #num { font-size: 12px; color: var(--amar); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  #nome { font-size: 19px; font-weight: 700; margin-top: 1px; }
+  #desc { font-size: 14px; line-height: 1.45; color: #dfe1e3; margin: 8px 0 0; }
+  #desc.fechado { display: none; }
+  #pontos { display: flex; gap: 5px; margin-top: 10px; }
+  #pontos button { flex: 1; height: 8px; padding: 0; border-radius: 4px; border: 0; background: rgba(255, 255, 255, .22); backdrop-filter: none; }
+  #pontos button.feito { background: rgba(242, 182, 50, .55); }
+  #pontos button.atual { background: var(--amar); }
+  #pontos button .bar { display: block; height: 100%; border-radius: 4px; background: var(--amar); }
+  #btnTexto { height: 34px; padding: 0 10px; font-size: 12.5px; white-space: nowrap; }
+
+  #rotulos { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+  .rot { position: absolute; left: 0; top: 0; will-change: transform; transition: opacity .35s; }
+  .rot .pt { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--amar); box-shadow: 0 0 0 3px rgba(242, 182, 50, .35); }
+  .rot .ln { position: absolute; height: 2px; background: var(--amar); transform-origin: 0 50%; }
+  .rot .tx { position: absolute; white-space: nowrap; font-size: 13px; font-weight: 700; letter-spacing: .06em; background: rgba(12, 14, 16, .72); padding: 4px 10px 5px; border-left: 4px solid var(--amar); border-radius: 0 6px 6px 0; }
+
+  #dica { position: fixed; left: 50%; top: 74px; transform: translateX(-50%); font-size: 13px; background: var(--fundo); padding: 7px 14px; border-radius: 20px; border: 1px solid var(--borda); transition: opacity .6s; pointer-events: none; text-align: center; max-width: calc(100vw - 24px); }
+  #veu { position: fixed; inset: 0; background: #11161b; opacity: 0; pointer-events: none; transition: opacity .22s; }
+  #carregando { position: fixed; inset: 0; display: grid; place-items: center; background: #1b2026; z-index: 10; transition: opacity .5s; }
+  #carregando .cx { text-align: center; }
+  #carregando .sp { width: 46px; height: 46px; border-radius: 50%; border: 4px solid rgba(255, 255, 255, .15); border-top-color: var(--amar); margin: 0 auto 14px; animation: gira 1s linear infinite; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  #erro { display: none; max-width: 420px; margin: 10px auto 0; color: #ffb4a8; font-size: 13px; }
+
+  @media (max-width: 640px) {
+    #titulo { padding: 7px 10px 8px; max-width: 46vw; }
+    #titulo h1 { font-size: 13.5px; }
+    #titulo p { display: none; }
+    #barra { max-width: 52vw; gap: 6px; }
+    #barra button { height: 36px; min-width: 36px; padding: 0 9px; font-size: 12.5px; }
+    #barra .lbl { display: none; }
+    #nome { font-size: 16px; }
+    #desc { font-size: 13px; }
+    #nav button { width: 46px; height: 46px; }
+    .rot .tx { font-size: 11px; padding: 3px 7px 4px; }
+    #dica { top: auto; bottom: 170px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="cena"></canvas>
+<div id="rotulos"></div>
+
+<div id="titulo">
+  <h1 id="tituloTxt">Controle de erosão e águas pluviais</h1>
+  <p id="subTxt">Montes Claros – MG · modelo 3D da solução proposta</p>
+</div>
+
+<div id="barra">
+  <a id="bSite" href="../index.html" title="Voltar ao site" style="height:40px;display:inline-flex;align-items:center;gap:6px;padding:0 12px;font-size:13.5px;color:inherit;text-decoration:none;border:1px solid var(--borda);background:var(--fundo);border-radius:10px">&#8592; <span class="lbl">Site</span></a>
+  <div class="seg" role="group" aria-label="Comparar antes e depois">
+    <button id="bAntes" title="Antes do projeto (tecla A)">Antes</button>
+    <button id="bDepois" title="Depois do projeto (tecla D)">Depois</button>
+  </div>
+  <button id="bRot" class="on" title="Etiquetas (tecla L)"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/></svg><span class="lbl">Etiquetas</span></button>
+  <button id="bCam" class="on" title="Câmera automática a cada etapa (tecla C)"><svg class="ic" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg><span class="lbl">Câmera auto</span></button>
+  <button id="bCentro" title="Voltar à vista da etapa (tecla R)"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+  <button id="bPainel" title="Esconder ou mostrar o painel (tecla H)"><svg class="ic" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+  <button id="bTela" title="Tela cheia (tecla F)"><svg class="ic" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+</div>
+
+<div id="painel">
+  <div id="topo">
+    <div id="nav">
+      <button id="ant" title="Etapa anterior (←)" aria-label="Etapa anterior">&#8249;</button>
+      <button id="prox" title="Próxima etapa (→ ou espaço)" aria-label="Próxima etapa">&#8250;</button>
+    </div>
+    <div id="info">
+      <div id="num">Etapa 1 de 11</div>
+      <div id="nome">Terreno natural</div>
+    </div>
+    <button id="btnTexto" title="Mostrar ou esconder a explicação (tecla T)">Texto</button>
+  </div>
+  <p id="desc"></p>
+  <div id="pontos"></div>
+</div>
+
+<div id="dica">Arraste para girar · role ou faça pinça para aproximar · botão direito ou dois dedos para mover</div>
+<div id="veu"></div>
+<div id="carregando"><div class="cx"><div class="sp"></div><div>Montando o terreno 3D…</div><div id="erro"></div></div></div>
+
+<script src="terreno.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
